@@ -7,14 +7,21 @@ import { APP_GUARD } from '@nestjs/core';
 import { AuthAdminGuard } from './common/guard/admin.guard';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'node:path';
 
 @Module({
   imports: [
     ConfigModule.forRoot(),
-    TasksModule, 
-    PrismaModule, 
+    TasksModule,
+    PrismaModule,
     UsersModule,
-    AuthModule
+    AuthModule,
+    // configuração para servir arquivos estáticos
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname,'..', 'files'),
+      serveRoot: "/files"
+    }),
   ],
   controllers: [],
   providers: [
@@ -27,9 +34,9 @@ import { AuthModule } from './auth/auth.module';
 export class AppModule {
   configure(consumer: MiddlewareConsumer) {
     consumer.apply(LoggerMiddleware)
-    .forRoutes({
-      path: '*',
-      method: RequestMethod.ALL
-    });
+      .forRoutes({
+        path: '*',
+        method: RequestMethod.ALL
+      });
   }
 }

@@ -1,9 +1,12 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
+
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-task.dto';
-import { HashingServiceProtocol } from 'src/auth/hash/hashing.service';
-import { PayloadTokenDto } from 'src/auth/dto/payload-token.dto';
+import { PrismaService } from '../prisma/prisma.service';
+import { HashingServiceProtocol } from '../auth/hash/hashing.service';
+import { PayloadTokenDto } from '../auth/dto/payload-token.dto';
+import * as path from 'node:path';
+import * as fs from 'node:fs/promises'
 
 @Injectable()
 export class UsersService {
@@ -11,7 +14,7 @@ export class UsersService {
     constructor(
         private prisma: PrismaService,
         private hashingService: HashingServiceProtocol
-    ) {}
+    ) { }
 
     async findAll() {
 
@@ -22,7 +25,7 @@ export class UsersService {
 
     async findOne(id: number) {
 
-        const user = await this.prisma.user.findUnique({
+        const user = await this.prisma.user.findFirst({
             where: {
                 id: id
             },
@@ -30,6 +33,7 @@ export class UsersService {
                 id: true,
                 name: true,
                 email: true,
+                avatar: true,
                 tasks: true
             }
         })
@@ -38,7 +42,7 @@ export class UsersService {
 
         throw new HttpException('Usuario não encontrado', HttpStatus.NOT_FOUND)
     }
-       
+
 
     async createUser(createUserDto: CreateUserDto) {
 
@@ -51,7 +55,7 @@ export class UsersService {
                     name: createUserDto.name,
                     email: createUserDto.email,
                     passwordHash: passwordHash
-                }, 
+                },
                 select: {
                     id: true,
                     name: true,
@@ -76,11 +80,11 @@ export class UsersService {
                 }
             })
 
-            if (!user){
+            if (!user) {
                 throw new HttpException('Usuário não encontrado', HttpStatus.NOT_FOUND)
-            } 
+            }
 
-            if (user.id !== TokenPayloadParam.sub){
+            if (user.id !== TokenPayloadParam.sub) {
                 throw new HttpException('Acesso negado', HttpStatus.BAD_REQUEST)
             }
 
@@ -125,11 +129,11 @@ export class UsersService {
                 }
             })
 
-            if (!user){
+            if (!user) {
                 throw new HttpException('Usuário não encontrado', HttpStatus.NOT_FOUND)
-            } 
+            }
 
-            if (user.id !== TokenPayloadParam.sub){
+            if (user.id !== TokenPayloadParam.sub) {
                 throw new HttpException('Acesso negado', HttpStatus.BAD_REQUEST)
             }
 
@@ -147,4 +151,49 @@ export class UsersService {
             throw new HttpException('Falha ao deletar usuário', HttpStatus.BAD_REQUEST)
         }
     }
+
+    async uploadAvatarImage(tokenPayload: PayloadTokenDto, file: Express.Multer.File) {
+        try {
+            const mimeType = file.mimetype;
+            const fileExtension = path.extname(file.originalname).toLowerCase().substring(1)
+
+            const fileName = `${tokenPayload.sub}.${fileExtension}`
+
+            const fileLocale = path.resolve(process.cwd(), 'files', fileName)
+
+            await fs.writeFile(fileLocale, file.buffer)
+
+            const user = await this.prisma.user.findFirst({
+                where: {
+                    id: tokenPayload.sub
+                }
+            })
+
+            if (!user) {
+                throw new HttpException('Falha ao atualizar o avatar do usuário!', HttpStatus.BAD_REQUEST)
+            }
+
+            const updatedUser = await this.prisma.user.update({
+                where: {
+                    id: user.id
+                },
+                data: {
+                    avatar: fileName
+                },
+                select: {
+                    id: true,
+                    name: true,
+                    email: true,
+                    avatar: true,
+                }
+            })
+
+            return updatedUser;
+
+        } catch (err) {
+            console.log(err);
+            throw new HttpException('Falha ao atualizar o avatar do usuário!', HttpStatus.BAD_REQUEST)
+        }
+    }
+
 }
