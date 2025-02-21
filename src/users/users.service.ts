@@ -66,7 +66,7 @@ export class UsersService {
             return user
 
         } catch (error) {
-            throw new HttpException('Falha ao cadastrar usuário', HttpStatus.BAD_REQUEST)
+            throw new HttpException('Falha ao cadastrar usuário!', HttpStatus.BAD_REQUEST)
         }
     }
 
@@ -115,7 +115,7 @@ export class UsersService {
             return updatedUser
 
         } catch (error) {
-            throw new HttpException('Falha ao atualizar usuário', HttpStatus.BAD_REQUEST)
+            throw new HttpException('Falha ao atualizar usuário!', HttpStatus.BAD_REQUEST)
         }
     }
 
