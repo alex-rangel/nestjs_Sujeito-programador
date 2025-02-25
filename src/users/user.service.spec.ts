@@ -4,7 +4,7 @@ import { PrismaService } from "../prisma/prisma.service";
 import { UsersService } from "./users.service";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { HttpException, HttpStatus } from "@nestjs/common";
-import { UpdateUserDto } from "./dto/update-task.dto";
+import { UpdateUserDto } from "./dto/update-user.dto";
 import { PayloadTokenDto } from "../auth/dto/payload-token.dto";
 import * as path from 'node:path';
 import * as fs from 'node:fs/promises'
