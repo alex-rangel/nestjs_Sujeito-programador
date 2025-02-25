@@ -144,11 +144,11 @@ export class UsersService {
             })
 
             return {
-                message: 'Usuário deletado com sucesso'
+                message: 'Usuário deletado com sucesso!'
             }
 
         } catch (error) {
-            throw new HttpException('Falha ao deletar usuário', HttpStatus.BAD_REQUEST)
+            throw new HttpException('Falha ao deletar usuário!', HttpStatus.BAD_REQUEST)
         }
     }
 
