@@ -1,0 +1,11 @@
+Para configurar os testes e2e com o jest é preciso seguir o passo a passo abaixo:
+
+1. modificar o arquivo `jest.config.js`;
+2. Criar o arquivo de teste para o modulo que deseja testar;
+3. Criar um arquivo de .env para o ambiente de teste;
+4. Criar uma base de dados para o ambiente de teste;
+5. Baixar o pacote cross-env para setar variaveis de ambiente;
+6. Criar um script no package.json para rodar os testes e2e;
+7. Confiruar o app.module.ts para que ele possa saber qual variaveis de ambiente ele deve usar;
+8. Depois de fazer essas configurações, rodar a aplicação para teste se está tudo funcionando.
+

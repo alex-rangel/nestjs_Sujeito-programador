@@ -12,7 +12,11 @@ import { join } from 'node:path';
 
 @Module({
   imports: [
-    ConfigModule.forRoot(),
+    ConfigModule.forRoot({
+      //configuração para setar qual arquivo .env será carregado de acordo com o ambiente
+      envFilePath: process.env.NODE_ENV ? 
+        `.env.${process.env.NODE_ENV}` : '.env'
+    }),
     TasksModule,
     PrismaModule,
     UsersModule,
