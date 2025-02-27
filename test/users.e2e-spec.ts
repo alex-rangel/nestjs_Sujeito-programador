@@ -76,6 +76,7 @@ describe('User (e2e)', () => {
 
   describe('/users', () => {
 
+    //teste para a criação de um usuário
     it('POST /users', async () => {
 
       const createUserDto = {
@@ -96,5 +97,97 @@ describe('User (e2e)', () => {
       });
 
     });
+
+    //teste para a criação de um usuário com a senha fraca
+    it('users (post) - weak password', async () => {
+
+      const createUserDto = {
+        name: 'Alex',
+        email: 'alex@email.com',
+        password: '123',
+      }
+
+      const response = await request(app.getHttpServer())
+        .post('/users')
+        .send(createUserDto)
+        .expect(400);
+
+    });
+
+    // it('/users (PATCH) - update user', async () => {
+    //   const createUserDto = {
+    //     name: 'Ana Carol',
+    //     email: 'ana@teste.com',
+    //     password: '123123'
+    //   }
+
+    //   const updateUserDto = {
+    //     name: 'Ana caroline'
+    //   }
+
+    //   const user = await request(app.getHttpServer())
+    //     .post('/users')
+    //     .send(createUserDto)
+    //     .expect(201)
+
+    //   const userId = user.body.id;
+
+    //   const authResponse = await request(app.getHttpServer())
+    //     .post('/auth')
+    //     .send({
+    //       email: createUserDto.email,
+    //       password: createUserDto.password
+    //     })
+    //     .expect(201)
+
+    //     const token = authResponse.body.token;
+
+    //   //expect(authResponse.body.token).toEqual(authResponse.body.token)
+
+    //   const updateResponse = await request(app.getHttpServer())
+    //     .patch(`/users/${userId.id}`)
+    //     .set("Authorization", `Bearer ${token}`)
+    //     .send(updateUserDto)
+
+    //   console.log(authResponse.body)
+    //   console.log(updateResponse.body)
+
+    //   expect(updateResponse.body).toEqual({
+    //     id: userId,
+    //     name: updateUserDto.name,
+    //     email: createUserDto.email,
+    //     avatar: null
+    //   });
+
+
+    // });
+
+    it('/users (DELETE) - delete a user', async () => {
+      const createUserDto = {
+        name: 'Lucas',
+        email: 'lucas@teste.com',
+        password: '123123'
+      }
+
+      const user = await request(app.getHttpServer())
+        .post('/users')
+        .send(createUserDto)
+        .expect(201)
+
+      const auth = await request(app.getHttpServer())
+        .post('/auth')
+        .send({
+          email: createUserDto.email,
+          password: createUserDto.password
+        })
+
+      const response = await request(app.getHttpServer())
+        .delete(`/users/${user.body.id}`)
+        .set("Authorization", `Bearer ${auth.body.token}`)
+
+      expect(response.body.message).toEqual('Usuário foi deletado com sucesso!')
+
+    })
+
   });
 });
