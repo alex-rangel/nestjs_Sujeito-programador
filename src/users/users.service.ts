@@ -7,6 +7,7 @@ import { HashingServiceProtocol } from '../auth/hash/hashing.service';
 import { PayloadTokenDto } from '../auth/dto/payload-token.dto';
 import * as path from 'node:path';
 import * as fs from 'node:fs/promises'
+import { ResponseCreateUserDto, ResponseFindOneUserDto, ResponseUpdateUserDto } from './dto/response-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -23,7 +24,7 @@ export class UsersService {
         return users
     }
 
-    async findOne(id: number) {
+    async findOne(id: number): Promise<ResponseFindOneUserDto> {
 
         const user = await this.prisma.user.findFirst({
             where: {
@@ -44,7 +45,7 @@ export class UsersService {
     }
 
 
-    async createUser(createUserDto: CreateUserDto) {
+    async createUser(createUserDto: CreateUserDto): Promise<ResponseCreateUserDto> {
 
         try {
 
@@ -70,7 +71,7 @@ export class UsersService {
         }
     }
 
-    async updateUser(id: number, updateUserDto: UpdateUserDto, TokenPayloadParam: PayloadTokenDto) {
+    async updateUser(id: number, updateUserDto: UpdateUserDto, TokenPayloadParam: PayloadTokenDto): Promise<ResponseCreateUserDto> {
 
         try {
 
@@ -152,7 +153,7 @@ export class UsersService {
         }
     }
 
-    async uploadAvatarImage(tokenPayload: PayloadTokenDto, file: Express.Multer.File) {
+    async uploadAvatarImage(tokenPayload: PayloadTokenDto, file: Express.Multer.File): Promise<ResponseUpdateUserDto> {
         try {
             const mimeType = file.mimetype;
             const fileExtension = path.extname(file.originalname).toLowerCase().substring(1)

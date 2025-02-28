@@ -11,6 +11,7 @@ import { AuthTokenGuard } from '../auth/guard/auth-token.guard';
 import { LoggerInterceptor } from '../common/interceptors/logger.interceptor';
 import { TokenPayloadParam } from '../auth/param/token-payload.param';
 import { PayloadTokenDto } from '../auth/dto/payload-token.dto';
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiParam } from '@nestjs/swagger';
 
 
 @Controller('users')
@@ -21,6 +22,7 @@ export class UsersController {
     constructor(private readonly userService: UsersService) { }
 
     @Get()
+    @ApiOperation({ summary: 'Lista todos os usurios' })
     findAllUsers() {
 
         console.log('Token teste: ', process.env.TOKEN_KEY)
@@ -29,16 +31,30 @@ export class UsersController {
     }
 
     @Get(":id")
+    @ApiOperation({ summary: 'Listar detalhes de um usuario' })
+    @ApiParam({ 
+            name: 'id', 
+            description: 'Id do usuario',
+            example: 1 
+        })
     findOneUser(@Param('id', ParseIntPipe) id: number) {
         return this.userService.findOne(id)
     }
 
     @Post()
+    @ApiOperation({ summary: 'Criar um usuario' })
     createUser(@Body() createUserDto: CreateUserDto) {
         return this.userService.createUser(createUserDto)
     }
 
     @UseGuards(AuthTokenGuard)
+    @ApiBearerAuth()
+    @ApiOperation({ summary: 'Atualizar um usuario' })
+    @ApiParam({ 
+        name: 'id', 
+        description: 'Id do usuario',
+        example: 1 
+    })
     @Patch(':id')
     updateUser(
         @Param('id', ParseIntPipe) id: number,
@@ -50,6 +66,13 @@ export class UsersController {
     }
 
     @UseGuards(AuthTokenGuard)
+    @ApiBearerAuth()
+    @ApiOperation({ summary: 'Deletar um usuario' })
+    @ApiParam({ 
+        name: 'id', 
+        description: 'Id do usuario',
+        example: 1 
+    })
     @Delete(':id')
     removeUser(
         @Param('id', ParseIntPipe) id: number,
@@ -59,6 +82,21 @@ export class UsersController {
     }
 
     @UseGuards(AuthTokenGuard)
+    @ApiBearerAuth()
+    @ApiOperation({ summary: 'Upload de arquivo' })
+    // As anotações @ApiConsumes e @ApiBody são usadas para configurar a documentação do Swagger para upload de arquivos
+    @ApiConsumes('multipart/form-data')
+    @ApiBody({
+        schema: {
+            type: 'object',
+            properties: {
+                file: {
+                    type: 'string',
+                    format: 'binary'
+                }
+            }
+        }
+    })
     @UseInterceptors(FileInterceptor('file'))
     @Post('upload')
     async uploadAvatar(

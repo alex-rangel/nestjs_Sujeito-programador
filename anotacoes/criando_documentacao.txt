@@ -6,3 +6,5 @@ npm install --save @nestjs/swagger e
 3 - proximo passo é configurar o swagger no main.ts:
 
 4 - depois vamos configurar um plugin, ele será configurado no arquivo nest-cli.json, que é um arquivo de configuração do nestjs. Vamos adicionar o plugin `@nestjs/swagger/plugin`:
+
+5 - para melhorar o dto da parte de atualização de uma tarefa podemos trocar a importação do PartialType que foi feita do @nestjs/mapped-types para o @nestjs/swagger:

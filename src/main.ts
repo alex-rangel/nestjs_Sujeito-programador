@@ -27,6 +27,8 @@ async function bootstrap() {
   const configSwagger = new DocumentBuilder()
   .setTitle('Lista de tarefas')
   .setDescription('API lista de tarefas.')
+  //para adicionar autenticação por token
+  .addBearerAuth()
   .setVersion('1.0')
   .build();
 
