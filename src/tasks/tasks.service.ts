@@ -1,28 +1,32 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { PaginationDto } from '../common/dto/pagination';
 import { UpdateTaskDto } from './dto/update-task.dto';
-import { PayloadTokenDto } from 'src/auth/dto/payload-token.dto';
+import { PaginationDto } from '../common/dto/pagination';
+import { PayloadTokenDto } from '../auth/dto/payload-token.dto';
+import { ResponseTaskDto } from './dto/response-task.dto';
 
 @Injectable()
 export class TasksService {
 
     constructor(private prisma: PrismaService) {}
 
-    async findAll(params?: PaginationDto) {
+    async findAll(paginationDto?: PaginationDto): Promise<ResponseTaskDto[]> {
 
-        const { limit, offset } = params || {};
+        const { limit = 10, offset = 0 } = paginationDto || {};
 
         const allTasks = await this.prisma.task.findMany({
             take: limit,
-            skip: offset
+            skip: offset,
+            orderBy: {
+                createdAt: 'desc'
+            }
         });
 
-        return allTasks; ;
+        return allTasks;
     }
 
-    async findOne(id: number) {
+    async findOne(id: number): Promise<ResponseTaskDto> {
         const task = await this.prisma.task.findUnique({
             where: { id }
         });
@@ -32,7 +36,7 @@ export class TasksService {
         throw new HttpException('Tarefa não foi encontrada', HttpStatus.NOT_FOUND);
     }
 
-    async createTask(createtask: CreateTaskDto, tokenPayLoad: PayloadTokenDto) {
+    async createTask(createtask: CreateTaskDto, tokenPayLoad: PayloadTokenDto): Promise<ResponseTaskDto> {
 
       try {
 
@@ -52,7 +56,7 @@ export class TasksService {
       }
     }
 
-    async updateTask(id: number, updateTask: UpdateTaskDto, tokenPayLoad: PayloadTokenDto) {
+    async updateTask(id: number, updateTask: UpdateTaskDto, tokenPayLoad: PayloadTokenDto): Promise<ResponseTaskDto> {
         
         const findTask = await this.prisma.task.findUnique({
             where: { id }

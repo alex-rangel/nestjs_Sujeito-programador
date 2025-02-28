@@ -20,9 +20,8 @@ export class TasksController {
     ) { }
 
     @Get()
-    findAllTasks(@Query() params: PaginationDto) {
-        console.log(this.keyToken)
-        return this.taskService.findAll(params);
+    findAllTasks(@Query() paginationDto: PaginationDto) {
+        return this.taskService.findAll(paginationDto);
     }
 
     @Get(":id")

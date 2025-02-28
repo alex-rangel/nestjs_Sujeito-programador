@@ -1,0 +1,8 @@
+1 - Para criar a documentação, vamos usar u swagger. Para isso, vamos instalar o pacote `@nestjs/swagger` e o `swagger-ui-express`:
+npm install --save @nestjs/swagger e 
+
+2 - a documentação do nestjs swagger: https://docs.nestjs.com/openapi/introduction
+
+3 - proximo passo é configurar o swagger no main.ts:
+
+4 - depois vamos configurar um plugin, ele será configurado no arquivo nest-cli.json, que é um arquivo de configuração do nestjs. Vamos adicionar o plugin `@nestjs/swagger/plugin`:
