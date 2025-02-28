@@ -12,7 +12,7 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'node:path';
 import { PrismaService } from '../src/prisma/prisma.service';
 import * as dotenv from 'dotenv';
-import { exec, execSync } from 'node:child_process';
+import { execSync } from 'node:child_process';
 
 // carrega as variáveis de ambiente do arquivo .env.test
 dotenv.config({ path: '.env.test' });
@@ -114,54 +114,47 @@ describe('User (e2e)', () => {
 
     });
 
-    // it('/users (PATCH) - update user', async () => {
-    //   const createUserDto = {
-    //     name: 'Ana Carol',
-    //     email: 'ana@teste.com',
-    //     password: '123123'
-    //   }
+    //teste para atualizar um usuário
+    it('/users (PATCH) - update user', async () => {
+      const createUserDto = {
+        name: 'Ana Carol',
+        email: 'ana@teste.com',
+        password: '123123'
+      }
 
-    //   const updateUserDto = {
-    //     name: 'Ana caroline'
-    //   }
+      const updateUserDto = {
+        name: 'Ana caroline'
+      }
 
-    //   const user = await request(app.getHttpServer())
-    //     .post('/users')
-    //     .send(createUserDto)
-    //     .expect(201)
+      const user = await request(app.getHttpServer())
+        .post('/users')
+        .send(createUserDto)
+        .expect(201)
 
-    //   const userId = user.body.id;
+        console.log('meu usuario: ', user)
 
-    //   const authResponse = await request(app.getHttpServer())
-    //     .post('/auth')
-    //     .send({
-    //       email: createUserDto.email,
-    //       password: createUserDto.password
-    //     })
-    //     .expect(201)
+      const auth = await request(app.getHttpServer())
+        .post('/auth')
+        .send({
+          email: createUserDto.email,
+          password: createUserDto.password
+        })
 
-    //     const token = authResponse.body.token;
+      expect(auth.body.user.token).toEqual(auth.body.user.token)
 
-    //   //expect(authResponse.body.token).toEqual(authResponse.body.token)
+      const response = await request(app.getHttpServer())
+        .patch(`/users/${auth.body.user.id}`)
+        .set("Authorization", `Bearer ${auth.body.user.token}`)
+        .send(updateUserDto)
 
-    //   const updateResponse = await request(app.getHttpServer())
-    //     .patch(`/users/${userId.id}`)
-    //     .set("Authorization", `Bearer ${token}`)
-    //     .send(updateUserDto)
+      expect(response.body).toEqual({
+        id: auth.body.user.id,
+        name: updateUserDto.name,
+        email: createUserDto.email
+      })
+    })
 
-    //   console.log(authResponse.body)
-    //   console.log(updateResponse.body)
-
-    //   expect(updateResponse.body).toEqual({
-    //     id: userId,
-    //     name: updateUserDto.name,
-    //     email: createUserDto.email,
-    //     avatar: null
-    //   });
-
-
-    // });
-
+    //teste para deletar um usuário
     it('/users (DELETE) - delete a user', async () => {
       const createUserDto = {
         name: 'Lucas',
@@ -182,10 +175,10 @@ describe('User (e2e)', () => {
         })
 
       const response = await request(app.getHttpServer())
-        .delete(`/users/${user.body.id}`)
-        .set("Authorization", `Bearer ${auth.body.token}`)
+        .delete(`/users/${auth.body.user.id}`)
+        .set("Authorization", `Bearer ${auth.body.user.token}`)
 
-      expect(response.body.message).toEqual('Usuário foi deletado com sucesso!')
+      expect(response.body.message).toEqual('Usuário deletado com sucesso!')
 
     })
 
